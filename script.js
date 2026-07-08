@@ -5,27 +5,6 @@
 
 const DATA_URL = 'data/profile.json';
 
-/** Minimal, dependency-free inline icon set keyed by platform. Falls back
- * to a generic "link" glyph for anything unrecognised. */
-const SOCIAL_ICONS = {
-  instagram: '📷',
-  twitter: '🐦',
-  x: '✕',
-  facebook: '📘',
-  youtube: '▶️',
-  tiktok: '🎵',
-  linkedin: '💼',
-  github: '🐙',
-  snapchat: '👻',
-  pinterest: '📌',
-  twitch: '🎮',
-  discord: '💬',
-  telegram: '✈️',
-  whatsapp: '📞',
-  spotify: '🎧',
-  link: '🔗',
-};
-
 async function loadProfile() {
   // Cache-bust so visitors always see the latest scrape, not a stale
   // service-worker-free browser cache of the JSON file.
@@ -51,23 +30,6 @@ function renderAvatar(profile) {
     appleTouchIconEl.href = profile.avatar;
   } else {
     avatarEl.alt = '';
-  }
-}
-
-function renderSocials(socials = []) {
-  const list = document.getElementById('socials');
-  list.innerHTML = '';
-  for (const social of socials) {
-    const li = document.createElement('li');
-    const a = document.createElement('a');
-    a.href = social.url;
-    a.className = 'social-link';
-    a.target = '_blank';
-    a.rel = 'noopener noreferrer';
-    a.setAttribute('aria-label', `${social.platform} profile`);
-    a.textContent = SOCIAL_ICONS[social.platform] || SOCIAL_ICONS.link;
-    li.appendChild(a);
-    list.appendChild(li);
   }
 }
 
@@ -147,14 +109,13 @@ function renderLastUpdated(generatedAt) {
 async function init() {
   try {
     const data = await loadProfile();
-    const { profile, links, socials, github } = data;
+    const { profile, links, github } = data;
 
     document.title = profile?.name ? `${profile.name} | Links` : 'Links';
     setText('display-name', profile?.name || 'Unknown');
     setText('bio', profile?.bio || '');
 
     renderAvatar(profile || {});
-    renderSocials(socials);
     renderLinks(links);
     renderGithubButton(github);
     renderLastUpdated(data.generatedAt);
