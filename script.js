@@ -87,18 +87,6 @@ function renderLinks(links = []) {
   });
 }
 
-function renderGithubButton(github) {
-  const wrap = document.getElementById('github-link-wrap');
-  if (!github?.htmlUrl) return;
-  wrap.innerHTML = '';
-  const a = document.createElement('a');
-  a.href = github.htmlUrl;
-  a.target = '_blank';
-  a.rel = 'noopener noreferrer';
-  a.textContent = `@${github.username} on GitHub`;
-  wrap.appendChild(a);
-}
-
 function renderLastUpdated(generatedAt) {
   if (!generatedAt) return;
   const date = new Date(generatedAt);
@@ -109,7 +97,7 @@ function renderLastUpdated(generatedAt) {
 async function init() {
   try {
     const data = await loadProfile();
-    const { profile, links, github } = data;
+    const { profile, links } = data;
 
     document.title = profile?.name ? `${profile.name} | Links` : 'Links';
     setText('display-name', profile?.name || 'Unknown');
@@ -117,7 +105,6 @@ async function init() {
 
     renderAvatar(profile || {});
     renderLinks(links);
-    renderGithubButton(github);
     renderLastUpdated(data.generatedAt);
   } catch (err) {
     console.error('[app] Failed to render profile:', err);
