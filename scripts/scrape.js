@@ -361,8 +361,16 @@ function detectRepository() {
 async function fetchGithubProfile(owner) {
   if (!owner) return null;
   try {
+    // Unauthenticated requests are capped at 60/hour and GitHub-hosted
+    // Actions runners share egress IPs with countless other workflows, so
+    // that cap gets exhausted almost immediately in CI. Authenticating
+    // with the workflow's own GITHUB_TOKEN (raises the cap to 5000/hour)
+    // keeps this reliable. No extra secret needs configuring — Actions
+    // injects GITHUB_TOKEN automatically.
+    const token = process.env.GITHUB_TOKEN || process.env.GH_TOKEN;
     const user = await fetchJson(`https://api.github.com/users/${owner}`, {
       Accept: 'application/vnd.github+json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
     });
     return {
       username: user.login,

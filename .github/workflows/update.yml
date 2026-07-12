@@ -41,7 +41,11 @@ jobs:
       - name: Run scraper
         # Never let a scrape failure fail the whole workflow: the script
         # already leaves previous data untouched on error, and Pages should
-        # keep serving the last known-good build.
+        # keep serving the last known-good build. GITHUB_TOKEN authenticates
+        # the GitHub user API call so it isn't hit by the 60/hour cap that
+        # unauthenticated requests share across all Actions runners.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm run scrape || echo "::warning::Scrape failed, keeping previous data/profile.json"
 
       - name: Check for changes
